@@ -24,6 +24,7 @@ class UserPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         $panel = $panel
+            ->default()
             ->id('user')
             ->path('user')
             ->login()

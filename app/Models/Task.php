@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Notification;
 
 class Task extends Model
 {
@@ -35,16 +36,13 @@ class Task extends Model
     }
 
     protected static function booted()
-{
-    static::updated(function ($task) {
-        if ($task->isDirty('status_id')) {
-            $admins = \App\Models\User::where('role', 'admin')->get();
-
-            foreach ($admins as $admin) {
-                $admin->notify(new \App\Notifications\TaskStatusUpdated($task));
+    {
+        static::updated(function ($task) {
+            if ($task->isDirty('status_id')) {
+                $admins = \App\Models\User::where('role', 'admin')->get();
+                Notification::send($admins, new \App\Notifications\TaskStatusUpdated($task));
             }
-        }
-    });
-}
+        });
+    }
 
 }

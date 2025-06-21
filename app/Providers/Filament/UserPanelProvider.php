@@ -25,10 +25,18 @@ class UserPanelProvider extends PanelProvider
         return $panel
             ->id('user')
             ->path('user')
+            ->login()
+            ->authGuard('web')
+            // ->auth(function () {
+            //     return auth()->check() && auth()->user()?->role === 'user'; 
+            // })
             ->colors([
                 'primary' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
+            ->resources([
+                \App\Filament\User\Resources\TaskResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
                 Pages\Dashboard::class,

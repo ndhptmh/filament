@@ -18,10 +18,10 @@ class EditUser extends EditRecord
         ];
     }
 
-    protected function afterCreate(): void
+    protected function afterSave(): void
     {
         Notification::make()
-            ->title('Successfully add data!')
+            ->title('Successfully edited data!')
             ->success()
             ->send();
     }
@@ -30,5 +30,5 @@ class EditUser extends EditRecord
     {
         return static::getResource()::getUrl('index');
     }
-    
+        
 }

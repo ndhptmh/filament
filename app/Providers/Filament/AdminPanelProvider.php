@@ -23,12 +23,21 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->default()
             ->id('admin')
             ->path('admin')
+            ->login()
+            ->authGuard('web')
             ->colors([
                 'primary' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
+            ->resources([
+                // \App\Filament\Admin\Resources\TaskResource::class,
+                \App\Filament\Admin\Resources\UserResource::class,
+                \App\Filament\Admin\Resources\StatusResource::class,
+                \App\Filament\Admin\Resources\LevelResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
                 Pages\Dashboard::class,
@@ -52,7 +61,6 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->login()
-            ->default();
+            ;
     }
 }

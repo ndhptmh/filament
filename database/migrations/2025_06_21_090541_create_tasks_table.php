@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->foreignId('level_id');
             $table->foreignId('status_id');
-            $table->foreignId('updated_by');
+            $table->foreignId('updated_by')->nullable();
             $table->string('title');
             $table->text('description')->nullable();
             $table->timestamps();

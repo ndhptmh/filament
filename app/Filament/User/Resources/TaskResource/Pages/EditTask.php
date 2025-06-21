@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Admin\Resources\LevelResource\Pages;
+namespace App\Filament\User\Resources\TaskResource\Pages;
 
-use App\Filament\Admin\Resources\LevelResource;
+use App\Filament\User\Resources\TaskResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
 
-class EditLevel extends EditRecord
+class EditTask extends EditRecord
 {
-    protected static string $resource = LevelResource::class;
+    protected static string $resource = TaskResource::class;
 
     protected function getHeaderActions(): array
     {

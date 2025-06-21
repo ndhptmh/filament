@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Filament\User\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\User\Resources\TaskResource\Pages;
-use App\Filament\User\Resources\TaskResource\RelationManagers;
+use App\Filament\Admin\Resources\TaskResource\Pages;
+use App\Filament\Admin\Resources\TaskResource\RelationManagers;
 use App\Models\Task;
-use App\Models\Status;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,9 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\SelectFilter;
-
 
 class TaskResource extends Resource
 {
@@ -27,30 +24,7 @@ class TaskResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->required()
-                    ->maxLength(255),
-
-                Forms\Components\Textarea::make('description')
-                    ->rows(1),
-
-                Forms\Components\Select::make('status_id')
-                    ->label('Status')
-                    ->relationship('status', 'name')
-                    ->required(),
-
-                Forms\Components\Select::make('level_id')
-                    ->label('Level')
-                    ->relationship('level', 'name')
-                    ->required(),
-
-                Forms\Components\Hidden::make('user_id')
-                    ->default(fn () => auth()->id())
-                    ->dehydrated(),
-                
-                Forms\Components\Hidden::make('updated_by')
-                    ->default(fn () => auth()->id())
-                    ->dehydrated(),
+                //
             ]);
     }
 
@@ -58,6 +32,7 @@ class TaskResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('user.name')->label('User'),
                 Tables\Columns\TextColumn::make('title')->searchable(),
                 Tables\Columns\TextColumn::make('status.name')->label('Status'),
                 Tables\Columns\TextColumn::make('level.name')->label('Level'),
@@ -78,28 +53,12 @@ class TaskResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Action::make('markCompleted')
-                    ->label('Mark as Completed')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn ($record) => $record->status->name !== 'Completed')
-                    ->action(function (Task $record) {
-                        $record->update([
-                            'status_id' => Status::where('name', 'Completed')->first()?->id,
-                        ]);
-                    }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->where('user_id', auth()->id());
     }
 
     public static function getRelations(): array

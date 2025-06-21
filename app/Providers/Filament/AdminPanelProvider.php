@@ -17,23 +17,24 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Http\Middleware\EnsureUserIsAdmin;
 
 class AdminPanelProvider extends PanelProvider
 {
+
     public function panel(Panel $panel): Panel
     {
-        return $panel
-            ->default()
+        $panel = $panel
             ->id('admin')
             ->path('admin')
-            ->login()
             ->authGuard('web')
+            ->default()
             ->colors([
                 'primary' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->resources([
-                // \App\Filament\Admin\Resources\TaskResource::class,
+                \App\Filament\Admin\Resources\TaskResource::class,
                 \App\Filament\Admin\Resources\UserResource::class,
                 \App\Filament\Admin\Resources\StatusResource::class,
                 \App\Filament\Admin\Resources\LevelResource::class,
@@ -48,6 +49,8 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
+                'web',
+                EnsureUserIsAdmin::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
@@ -61,6 +64,17 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ;
+            ->login();
+
+            $panel->auth(function () {
+                if (!auth()->check() || auth()->user()->role !== 'admin') {
+                    abort(403); 
+                }
+            
+                return true;
+            });
+
+        return $panel;
     }
+
 }

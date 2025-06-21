@@ -33,4 +33,18 @@ class Task extends Model
     {
     	return $this->hasOne('App\Models\User', 'id', 'updated_by');
     }
+
+    protected static function booted()
+{
+    static::updated(function ($task) {
+        if ($task->isDirty('status_id')) {
+            $admins = \App\Models\User::where('role', 'admin')->get();
+
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\TaskStatusUpdated($task));
+            }
+        }
+    });
+}
+
 }

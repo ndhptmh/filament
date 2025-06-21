@@ -17,19 +17,17 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Http\Middleware\EnsureUserIsUser;
 
 class UserPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        $panel = $panel
             ->id('user')
             ->path('user')
             ->login()
             ->authGuard('web')
-            // ->auth(function () {
-            //     return auth()->check() && auth()->user()?->role === 'user'; 
-            // })
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -47,6 +45,8 @@ class UserPanelProvider extends PanelProvider
                 Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
+                'web',
+                EnsureUserIsUser::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
@@ -60,5 +60,15 @@ class UserPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+
+            $panel->auth(function () {
+                if (!auth()->check() || auth()->user()->role !== 'user') {
+                    abort(403);
+                }
+            
+                return true;
+            });
+
+        return $panel;
     }
 }
